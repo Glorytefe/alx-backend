@@ -41,7 +41,9 @@ class Server:
         """indexed data set"""
         if self.__indexed_dataset is None:
             dataset = self.dataset()
-            self.__indexed_dataset = {i: dataset[i] for i in range(len(dataset))}
+            self.__indexed_dataset = {
+                i: dataset[i] for i in range(len(dataset))
+            }
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
@@ -49,7 +51,8 @@ class Server:
         Retrieves data from a given index with a specified size.
         """
         indexed_data = self.indexed_dataset()
-        assert index is not None and index >= 0 and index <= max(indexed_data.keys())
+        assert index is not None and index >= 0
+        assert index <= max(indexed_data.keys())
         data = []
         count = 0
         next_index = None
