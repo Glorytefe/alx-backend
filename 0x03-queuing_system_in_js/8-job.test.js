@@ -24,20 +24,20 @@ describe('createPushNotificationsJobs', () => {
     expect(QUEUE.testMode.jobs.length).to.equal(0);
     const jobs = [
       {
-        phoneNumber: '0123456789',
-        message: 'Your One Time pin is 2134.',
+        phoneNumber: '4153518780',
+        message: 'This is the code 1234 to verify your account'
       },
       {
-        phoneNumber: '12098745443',
-        message: 'Your One Time pin is 2134.',
+        phoneNumber: '4153518781',
+        message: 'This is the code 4562 to verify your account'
       },
     ];
     createPushNotificationsJobs(jobs, QUEUE);
     expect(QUEUE.testMode.jobs.length).to.equal(2);
     expect(QUEUE.testMode.jobs[0].data).to.deep.equal(jobs[0]);
     expect(CONSOLE_SPY.calledTwice).to.be.true;
-    expect(QUEUE.testMode.jobs[0].type).to.equal('job_notification_1');
-    QUEUE.process('job_notification_1', () => {
+    expect(QUEUE.testMode.jobs[0].type).to.equal('push_notification_code_3');
+    QUEUE.process('push_notification_code_3', () => {
       expect(
         CONSOLE_SPY.log
           .calledWith('Notification job created:', QUEUE.testMode.jobs[0].id)
