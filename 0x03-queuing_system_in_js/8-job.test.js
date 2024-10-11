@@ -4,7 +4,7 @@ import { createQueue } from 'kue';
 import { expect } from 'chai';
 
 describe('createPushNotificationsJobs', () => {
-  const QUEUE = createQueue({ name: 'job_notification' });
+  const QUEUE = createQueue({ name: 'push_notification_code' });
   const CONSOLE_SPY = sinon.spy(console);
 
   before(() => {
