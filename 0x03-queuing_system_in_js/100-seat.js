@@ -1,14 +1,13 @@
-#!/usr/bin/yarn dev
 import express from 'express';
-import { promisify } from 'util';
 import { createQueue } from 'kue';
 import { createClient } from 'redis';
+import { promisify } from 'util';
 
 const app = express();
 const client = createClient({ name: 'reserve_seat' });
 const queue = createQueue();
 let reservationEnabled = false;
-const INITIAL_SEATS_COUNT = 50;
+const INITIAL_SEATS_COUNT  = 50;
 const PORT = 1245;
 
 /**
@@ -27,6 +26,7 @@ const getCurrentAvailableSeats = async () => {
   return promisify(client.GET).bind(client)('available_seats');
 };
 
+/* Gets number of available seats */
 app.get('/available_seats', (_, res) => {
   getCurrentAvailableSeats()
     .then((numberOfAvailableSeats) => {
@@ -64,6 +64,7 @@ app.get('/reserve_seat', (_req, res) => {
   }
 });
 
+/* Processes seats reservation jobs */
 app.get('/process', (_req, res) => {
   res.json({ status: 'Queue processing' });
   queue.process('reserve_seat', (_job, done) => {
@@ -71,7 +72,7 @@ app.get('/process', (_req, res) => {
       .then((result) => Number.parseInt(result || 0))
       .then((availableSeats) => {
         reservationEnabled = availableSeats <= 1 ? false : reservationEnabled;
-        if (availableSeats >= 1) {
+        if (availableSeats > 0) {
           reserveSeat(availableSeats - 1)
             .then(() => done());
         } else {
@@ -81,13 +82,13 @@ app.get('/process', (_req, res) => {
   });
 });
 
-const resetAvailableSeats = async (initialSeatsCount) => {
+const initialAvailableSeats = async (initialSeatsCount) => {
   return promisify(client.SET)
     .bind(client)('available_seats', Number.parseInt(initialSeatsCount));
 };
 
 app.listen(PORT, () => {
-  resetAvailableSeats(process.env.INITIAL_SEATS_COUNT || INITIAL_SEATS_COUNT)
+  initialAvailableSeats(process.env.INITIAL_SEATS_COUNT  || INITIAL_SEATS_COUNT)
     .then(() => {
       reservationEnabled = true;
       console.log(`API available on localhost port ${PORT}`);

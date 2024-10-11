@@ -1,4 +1,3 @@
-#!/usr/bin/yarn dev
 import { Queue, Job } from 'kue';
 
 /**
